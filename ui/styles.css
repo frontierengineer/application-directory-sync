@@ -176,6 +176,25 @@
 }
 
 /* Sidebar */
+/* ── App shell (shell-v2) ─────────────────────────────────────────────
+   The Directory Sync app owns its whole content rect: a left rail (the pairs
+   list) and a main pane (the dashboard), composed with the app-kit Split. */
+.dirsync-app {
+  height: 100%;
+  width: 100%;
+}
+.dirsync-app .dirsync-view {
+  height: 100%;
+}
+.dirsync-sidebar-title {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+.dirsync-new-btn {
+  width: 100%;
+}
+
 .dirsync-sidebar {
   display: flex;
   flex-direction: column;
