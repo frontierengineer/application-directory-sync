@@ -1,6 +1,6 @@
 import { createRoot } from 'react-dom/client';
-import { ApplicationSidebar, Split } from '@frontierengineer/ui';
-import type { UiV1, UiProvider, ApplicationHost } from '../../types';
+import { ExtensionSidebar, Split } from '@frontierengineer/ui';
+import type { UiV1, UiProvider, ExtensionHost } from '../../types';
 import { createClient } from './data';
 import { createActions } from './actions';
 import { DirSyncView } from './components/DirSyncView';
@@ -8,7 +8,7 @@ import { DirSyncSidebar } from './components/DirSyncSidebar';
 import './styles.css';
 
 // ─────────────────────────────────────────────────────────────────────
-// The Directory Sync app (shell-v2). ONE ui.application.register that owns the
+// The Directory Sync app (shell-v2). ONE ui.extension.register that owns the
 // whole content rect: a left rail listing the sync pairs (with a New Sync Pair
 // action) and a main pane holding the single dashboard view of all pairs. There
 // is no host tab bar and no host sidebar badge — every row drives the one
@@ -16,12 +16,12 @@ import './styles.css';
 // The sidebar and view components are re-housed verbatim.
 // ─────────────────────────────────────────────────────────────────────
 
-function DirSyncApp({ ui, host }: { ui: UiV1; host: ApplicationHost }) {
+function DirSyncApp({ ui, host }: { ui: UiV1; host: ExtensionHost }) {
   const client = createClient(host.bus);
   const actions = createActions(ui, client);
 
   const sidebar = (
-    <ApplicationSidebar
+    <ExtensionSidebar
       header={<div className="dirsync-sidebar-title">Directory Sync</div>}
       footer={
         <button
@@ -38,7 +38,7 @@ function DirSyncApp({ ui, host }: { ui: UiV1; host: ApplicationHost }) {
         machines={host.machines}
         navigate={() => { /* one dashboard — every row already drives this view */ }}
       />
-    </ApplicationSidebar>
+    </ExtensionSidebar>
   );
 
   return (
@@ -71,15 +71,15 @@ export function register(uiProvider: UiProvider): void {
     run: () => void actions.newPair(),
   });
 
-  // ONE app per application — the whole directory-sync experience lives in here.
+  // ONE app per extension — the whole directory-sync experience lives in here.
   let root: ReturnType<typeof createRoot> | null = null;
-  ui.application.register({
+  ui.extension.register({
     id: 'dir-sync',
     title: 'Directory Sync',
     // Two folders with a sync arrow between them.
     icon: 'M1.5 4.5a1 1 0 0 1 1-1H5l1 1.2h1.5M1.5 4.5v6a1 1 0 0 0 1 1H6M9.5 11.5h4a1 1 0 0 0 1-1v-6l-1-1.2H10M11.5 6.5l2-2-2-2M4.5 8.5l-2 2 2 2',
     color: '#f59e0b',
-    mount(host: ApplicationHost) {
+    mount(host: ExtensionHost) {
       root = createRoot(host.container);
       root.render(<DirSyncApp ui={ui} host={host} />);
       return () => { root?.unmount(); root = null; };
