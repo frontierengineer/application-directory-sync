@@ -65,19 +65,24 @@ export function createActions(ui: UiV1, client: DirSyncClient): DirSyncActions {
       return;
     }
     let promptFields = opts.initialFields;
-    let error: string | null = null;
     for (;;) {
       const values = await ui.modals.prompt({
         title: opts.title,
-        description: error ? `${error}\n\n${MIRROR_WARNING}` : MIRROR_WARNING,
+        // The host renders a prompt's `description` only as a hover tooltip on a
+        // ? icon (modal-text policy), so it suits the standing mirror caveat but
+        // NOT a validation error — an error tucked there reads as "I clicked
+        // Create and nothing happened". So the warning rides the tooltip and a
+        // rejection is surfaced as its own visible notice (below) before the
+        // prompt re-opens with the rejected values prefilled.
+        description: MIRROR_WARNING,
         fields: promptFields,
         submitLabel: opts.submitLabel,
       });
       if (!values) return;
       const res = await opts.submit(toInput(values));
       if (!res?.error) return;
-      error = res.error;
       promptFields = promptFields.map((f) => ({ ...f, default: values[f.key] ?? f.default }));
+      await notice(`Couldn’t ${opts.submitLabel.toLowerCase()} this pair`, res.error);
     }
   }
 
